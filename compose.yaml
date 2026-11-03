@@ -1,0 +1,18 @@
+services:
+  relay:
+    build: .
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      APP_MODE: production
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?Set ADMIN_TOKEN to at least 32 characters}
+      LANGUAGE_MODE: guided
+    volumes:
+      - relay-data:/app/data
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  relay-data:

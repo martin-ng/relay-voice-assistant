@@ -1,0 +1,14 @@
+.git
+.venv
+.env
+.env.*
+data
+artifacts
+__pycache__
+.pytest_cache
+.coverage
+*.db
+*.db-*
+*.wav
+*.mp3
+.DS_Store

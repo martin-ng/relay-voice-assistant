@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Relay · Voice operations</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Relay home"
+        ><span class="brand-icon">r</span> relay<span class="brand-dot"
+          >.</span
+        ></a
+      >
+      <div class="workspace">
+        <span class="workspace-icon">RA</span>
+        <div><strong>Relay Auto</strong><small>Service workspace</small></div>
+        <span>⌄</span>
+      </div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <button class="nav active" data-view="overview">
+          <span>◫</span> Overview
+        </button>
+        <button class="nav" data-view="appointments">
+          <span>▦</span> Appointments
+        </button>
+        <button class="nav" data-view="sessions">
+          <span>◌</span> Conversations
+        </button>
+        <button class="nav" data-view="handoffs">
+          <span>⇄</span> Handoff queue <b id="handoff-badge">0</b>
+        </button>
+        <button class="nav" data-view="activity">
+          <span>⌁</span> Activity
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="online">
+          <i></i> <span id="connection">Connecting</span>
+        </div>
+        <p>Local development workspace</p>
+        <button class="text-button" id="operator-auth">
+          Operator access ↗
+        </button>
+      </div>
+    </aside>
+    <main>
+      <header class="topbar">
+        <span
+          >Workspace <span class="slash">/</span>
+          <strong id="breadcrumb">Overview</strong></span
+        >
+        <div>
+          <span class="environment">LOCAL DEMO</span
+          ><span class="avatar">RA</span>
+        </div>
+      </header>
+      <div class="page">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">VOICE OPERATIONS</div>
+            <h1 id="page-title">A little less busywork.</h1>
+            <p id="page-subtitle">Your front desk, with room to breathe.</p>
+          </div>
+          <button class="button primary" id="new-session">
+            ＋ New conversation
+          </button>
+        </div>
+        <div id="notice" class="notice" role="status" hidden></div>
+        <section class="metrics" aria-label="Workspace metrics">
+          <article class="metric">
+            <span>Confirmed appointments <span>↗</span></span
+            ><strong id="metric-bookings">—</strong
+            ><small>Across all sessions</small>
+          </article>
+          <article class="metric">
+            <span>Conversations <span>◌</span></span
+            ><strong id="metric-sessions">—</strong
+            ><small>Persistent session history</small>
+          </article>
+          <article class="metric">
+            <span>Server turn latency <span>⌁</span></span
+            ><strong id="metric-latency">—</strong
+            ><small>p95 · latest 1,000 turns · excludes voice</small>
+          </article>
+          <article class="metric">
+            <span>Needs a human <span>⇄</span></span
+            ><strong id="metric-handoffs">—</strong
+            ><small>Open handoff requests</small>
+          </article>
+        </section>
+        <div class="content-grid">
+          <div class="operations">
+            <section class="panel" id="overview-panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>On the schedule</h2>
+                  <p>One service bay. Every appointment accounted for.</p>
+                </div>
+                <span class="tag">EASTERN TIME</span>
+              </div>
+              <div class="table-toolbar">
+                <div class="tabs" role="group" aria-label="Filter appointments">
+                  <button class="tab active" data-filter="confirmed">
+                    Upcoming</button
+                  ><button class="tab" data-filter="all">
+                    All appointments
+                  </button>
+                </div>
+                <input
+                  id="search"
+                  type="search"
+                  placeholder="Find a reference or service…"
+                  aria-label="Search appointments"
+                />
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>APPOINTMENT</th>
+                      <th>WHEN</th>
+                      <th>STATUS</th>
+                      <th>REFERENCE</th>
+                    </tr>
+                  </thead>
+                  <tbody id="appointment-rows"></tbody>
+                </table>
+              </div>
+              <div id="appointment-empty" class="empty" hidden>
+                <div class="empty-icon">▦</div>
+                <h3>A clear calendar. A fresh start.</h3>
+                <p>
+                  Book your first appointment with the assistant.<br />It will
+                  appear here after you confirm.
+                </p>
+                <button class="button secondary" id="demo-book">
+                  Try an inspection →
+                </button>
+              </div>
+              <div class="panel-footer">
+                <span id="appointment-count">Loading appointments…</span
+                ><span>Mon–Fri · 9:00–17:00 ET</span>
+              </div>
+            </section>
+            <section class="panel" id="sessions-panel" hidden>
+              <div class="panel-heading">
+                <div>
+                  <h2>Conversations</h2>
+                  <p>Inspect session outcomes and messages.</p>
+                </div>
+              </div>
+              <div id="session-list" class="list"></div>
+              <div id="transcript" class="transcript" hidden></div>
+            </section>
+            <section class="panel" id="handoffs-panel" hidden>
+              <div class="panel-heading">
+                <div>
+                  <h2>Human handoffs</h2>
+                  <p>Requests stay here until an operator resolves them.</p>
+                </div>
+              </div>
+              <div id="handoff-list" class="list"></div>
+            </section>
+            <section class="panel" id="activity-panel" hidden>
+              <div class="panel-heading">
+                <div>
+                  <h2>Activity stream</h2>
+                  <p>Booking actions, failures, and turn timings.</p>
+                </div>
+              </div>
+              <div id="event-list" class="list"></div>
+            </section>
+            <section class="bottom-grid" id="overview-extras">
+              <article class="info-card">
+                <div class="card-icon">↳</div>
+                <h3>Confirmation comes first.</h3>
+                <p>
+                  The assistant checks availability, proposes a time, and waits
+                  for your approval before changing an appointment.
+                </p>
+                <div class="step-line">
+                  <span>Find</span><i>→</i><span>Confirm</span><i>→</i
+                  ><span>Book</span>
+                </div>
+              </article>
+              <article class="info-card dark">
+                <span class="tag">BUILT TO BE INSPECTED</span>
+                <h3>Every action has a trail.</h3>
+                <p>
+                  See what happened, when it happened, and which conversation it
+                  belongs to.
+                </p>
+                <button class="text-button" id="view-activity">
+                  Explore activity <span>↗</span>
+                </button>
+              </article>
+            </section>
+            <p class="workspace-note">
+              Simulated calendar · Real local persistence · No external calendar
+              connected
+            </p>
+          </div>
+          <section class="assistant panel" aria-label="Scheduling assistant">
+            <div class="assistant-heading">
+              <div class="assistant-mark">
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <div>
+                <h2>Meet your front desk.</h2>
+                <p><i></i> Relay scheduling assistant</p>
+              </div>
+              <button
+                id="reset-chat"
+                class="icon-button"
+                title="Start a new session"
+                aria-label="Start a new session"
+              >
+                ↻
+              </button>
+            </div>
+            <div class="engine-label">
+              Guided demo <span>·</span> Text + browser speech
+            </div>
+            <div
+              id="messages"
+              class="messages"
+              role="log"
+              aria-live="polite"
+              aria-label="Conversation"
+            ></div>
+            <div id="choices" class="choices"></div>
+            <div class="quick-actions">
+              <button data-message="my appointments">My bookings</button
+              ><button data-message="business hours">Hours</button
+              ><button data-message="human">Talk to a person</button>
+            </div>
+            <form id="chat-form">
+              <label class="sr-only" for="message">Message the assistant</label>
+              <div class="composer">
+                <input
+                  id="message"
+                  placeholder="Ask to book an inspection…"
+                  maxlength="1000"
+                  autocomplete="off"
+                  required
+                /><button
+                  type="button"
+                  id="mic"
+                  class="icon-button"
+                  aria-label="Dictate a message"
+                  title="Dictate a message"
+                >
+                  ♩</button
+                ><button type="submit" id="send" aria-label="Send message">
+                  ↑
+                </button>
+              </div>
+            </form>
+            <div class="voice-controls">
+              <label
+                ><input type="checkbox" id="speak" /> Read replies aloud</label
+              ><span id="voice-status">Microphone off</span>
+            </div>
+            <p class="assistant-note">
+              Confirmations expire after 5 minutes. Use demo data only; messages
+              are stored locally.
+            </p>
+          </section>
+        </div>
+        <footer>
+          <span
+            >RELAY <span class="footer-separator">/</span> More human
+            time.</span
+          ><a href="/docs" target="_blank" rel="noreferrer">API reference ↗</a>
+        </footer>
+      </div>
+    </main>
+    <dialog id="auth-dialog">
+      <form method="dialog">
+        <h2>Operator access</h2>
+        <p>
+          Enter the ADMIN_TOKEN configured on the server.<br />It stays in this
+          tab’s memory.
+        </p>
+        <input
+          type="password"
+          id="auth-token"
+          placeholder="Operator token"
+          aria-label="Operator token"
+        />
+        <div class="dialog-actions">
+          <button class="button secondary" value="cancel">Cancel</button
+          ><button class="button primary" id="save-token" value="save">
+            Connect
+          </button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python environments, caches and build output
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.egg-info/
+build/
+dist/
+
+# Runtime data, backups and generated reports
+/data/
+/backups/
+/artifacts/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+*.wav
+*.mp3
+
+# Local editor and OS state
+.DS_Store
+.idea/
+.vscode/
+.codex/
+.claude/
