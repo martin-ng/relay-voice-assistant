@@ -81,7 +81,7 @@ This is a turn-based browser interface, not a full-duplex telephony integration.
 ## Tests and evaluations
 
 ```sh
-uv run --frozen --extra test pytest tests -q --cov=app --cov-report=term-missing
+uv run --frozen --extra test python -m pytest tests -q --cov=app --cov-report=term-missing
 uv run --frozen python scripts/evaluate.py
 node --check app/static/app.js
 ```

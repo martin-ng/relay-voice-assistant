@@ -4,7 +4,7 @@ setup:
 run:
 	uv run --frozen uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8765
 test:
-	uv run --frozen --extra test pytest tests -q
+	uv run --frozen --extra test python -m pytest tests -q
 evaluate:
 	uv run --frozen python scripts/evaluate.py
 check: test evaluate

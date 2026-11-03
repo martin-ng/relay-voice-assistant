@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: "22"
       - run: uv sync --frozen --extra test --python 3.13
-      - run: uv run --frozen pytest tests -q --cov=app --cov-report=term-missing
+      - run: uv run --frozen python -m pytest tests -q --cov=app --cov-report=term-missing
       - run: uv run --frozen python scripts/evaluate.py
       - run: node --check app/static/app.js
       - uses: actions/upload-artifact@v4
